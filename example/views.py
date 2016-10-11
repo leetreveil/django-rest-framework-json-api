@@ -6,13 +6,39 @@ import rest_framework_json_api.metadata
 import rest_framework_json_api.parsers
 import rest_framework_json_api.renderers
 from rest_framework_json_api.views import RelationshipView
-from example.models import Blog, Entry, Author, Comment
+from example.models import Blog, Entry, Author, Comment, ProfileDatum
 from example.serializers import (
-    BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer)
+    BlogSerializer, EntrySerializer, AuthorSerializer, CommentSerializer, ProfileDatumSerializer, FacebookAdTargetingCategorySerializer)
 
 from rest_framework_json_api.utils import format_drf_errors
 
 HTTP_422_UNPROCESSABLE_ENTITY = 422
+
+
+class ProfileDatumViewSet(viewsets.ModelViewSet):
+    queryset = ProfileDatum.objects.select_related('category')
+    serializer_class = ProfileDatumSerializer
+
+
+    def dispatch(self, request, *args, **kwargs):
+        ret = super(ProfileDatumViewSet, self).dispatch(request, *args, **kwargs)
+
+        # force rendering of the view before returning to DRF/Django
+        ret.render()
+
+        from cStringIO import StringIO
+        out = StringIO()
+        lprof.print_stats(stream=out)
+        print out.getvalue()
+
+        return ret
+
+from line_profiler import LineProfiler
+
+
+lprof = LineProfiler()
+lprof.add_function(rest_framework.views.APIView.dispatch)
+lprof.enable_by_count()
 
 
 class BlogViewSet(viewsets.ModelViewSet):

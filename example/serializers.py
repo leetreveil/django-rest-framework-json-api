@@ -1,6 +1,6 @@
 from datetime import datetime
 from rest_framework_json_api import serializers, relations
-from example.models import Blog, Entry, Author, AuthorBio, Comment
+from example.models import Blog, Entry, Author, AuthorBio, Comment, FacebookAdTargetingCategory, ProfileDatum
 
 
 class BlogSerializer(serializers.ModelSerializer):
@@ -92,3 +92,21 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         exclude = ('created_at', 'modified_at',)
         # fields = ('entry', 'body', 'author',)
+
+
+class FacebookAdTargetingCategorySerializer(serializers.ModelSerializer):
+    'Serializer for FacebookAdTargetingCategory model'
+
+    class Meta:
+        'Configuration for serializer'
+        model = FacebookAdTargetingCategory
+
+
+class ProfileDatumSerializer(serializers.ModelSerializer):
+    'Serializer for the ProfileDatum model'
+
+    class Meta:
+        'Configuration for serializer'
+        model = ProfileDatum
+
+    included_serializers = {'category': FacebookAdTargetingCategorySerializer}
